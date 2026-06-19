@@ -87,13 +87,11 @@ export default function ImageUpload({ value, onChange, label, className }: Props
       {preview ? (
         /* Preview */
         <div className="relative rounded-xl overflow-hidden border border-border bg-muted aspect-video">
-          <Image
-            src={preview}
-            alt="Preview"
-            fill
-            sizes="400px"
-            className="object-cover"
-          />
+            <img                          // 👈 replace Image with img
+              src={preview}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
           {/* Remove button */}
           <button
             type="button"
