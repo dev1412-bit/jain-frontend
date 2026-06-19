@@ -2,8 +2,8 @@ import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
 // Correct — separate the two URLs
-const API_URL  = process.env.NEXT_PUBLIC_API_URL  || "http://localhost:8000/api";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8000";
+const API_URL  = process.env.NEXT_PUBLIC_API_URL ;
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ;
 
 export const initCsrf = async () => {
   await axios.get(`${BASE_URL}/sanctum/csrf-cookie`, {  // no /api prefix
@@ -12,7 +12,7 @@ export const initCsrf = async () => {
 };
 
 const api = axios.create({
-  baseURL: API_URL,   // http://localhost:8000/api
+  baseURL: API_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
