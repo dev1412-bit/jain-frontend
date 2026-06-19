@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "gymx.jain.software",
-        pathname: "/storage/**",
+        pathname: "/jain-net-backend/storage/**",
       },
     ],
   },

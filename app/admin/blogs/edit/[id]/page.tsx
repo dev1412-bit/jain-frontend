@@ -23,7 +23,7 @@ export default function AdminBlogEditPage() {
         const data = await fetchAdminPost(id);
         setPost(data);
       } catch {
-        router.push("/admin/blog");
+        router.push("/admin/blogs");
       } finally {
         setLoading(false);
       }
