@@ -1,4 +1,4 @@
-import api, { initCsrf } from "@/lib/axios";
+import api from "@/lib/axios";
 import { AuthUser } from "@/store/authStore";
 
 export type LoginPayload = {
@@ -18,18 +18,42 @@ export type AuthResponse = {
   user: AuthUser;
 };
 
-export const loginUser = async (payload: LoginPayload): Promise<AuthResponse> => {
-  await initCsrf();                               // get CSRF cookie first
+
+export const loginUser = async (
+  payload: LoginPayload
+): Promise<AuthResponse> => {
+
   const { data } = await api.post("/login", payload);
+
+  // save token
+  if (data.data.token) {
+    localStorage.setItem(
+      "token",
+      data.data.token
+    );
+  }
+
   return {
     message: data.message,
     user: data.data.user,
   };
 };
 
-export const registerUser = async (payload: RegisterPayload): Promise<AuthResponse> => {
-  await initCsrf();                               // get CSRF cookie first
+
+export const registerUser = async (
+  payload: RegisterPayload
+): Promise<AuthResponse> => {
+
   const { data } = await api.post("/register", payload);
+
+  // save token after register
+  if (data.data.token) {
+    localStorage.setItem(
+      "token",
+      data.data.token
+    );
+  }
+
   return {
     message: data.message,
     user: data.data.user,
