@@ -50,7 +50,7 @@ export default function AdminBlogEditPage() {
           : [],
         status: publishNow ? "published" : data.status,
       } as any);
-      router.push("/admin/blog");
+      router.push("/admin/blogs");
     } catch {
       // error shown via toast in store
     } finally {

@@ -97,7 +97,7 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <Link
-            href="/admin/blog"
+            href="/admin/blogs"
             className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-accent transition-colors"
           >
             <ArrowLeft className="h-4 w-4 text-muted-foreground" />

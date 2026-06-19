@@ -43,8 +43,6 @@ export default function BlogPage() {
     fetchPosts();
     fetchCategories();
   }, []);
-
-  // re-fetch when search changes (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchPosts(searchQuery ? { search: searchQuery } : {});
@@ -54,18 +52,13 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero + Search */}
       <BlogHero />
-
-      {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-
-        {/* Category pills */}
         <CategoryFilter />
 
         {loading ? (
           <>
-            {/* Featured skeleton */}
+           
             <div className="rounded-2xl border border-border overflow-hidden mb-6">
               <div className="grid grid-cols-1 lg:grid-cols-2">
                 <Skeleton className="aspect-[16/10] lg:min-h-[260px] w-full" />
@@ -87,10 +80,7 @@ export default function BlogPage() {
           </div>
         ) : (
           <>
-            {/* Featured post */}
             {featuredPost && <FeaturedPost post={featuredPost} />}
-
-            {/* Blog grid */}
             {posts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
                 <FileSearch className="h-10 w-10 text-muted-foreground/30" />

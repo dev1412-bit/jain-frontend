@@ -114,7 +114,9 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
 
       // separate featured from regular
       const featured = data.find((p: Blog) => p.featured) ?? null;
-      const regular  = data.filter((p: Blog) => !p.featured);
+      const regular = featured 
+        ? data.filter((p: Blog) => p.id !== featured.id)
+        : data;
 
       set({
         posts: regular,
