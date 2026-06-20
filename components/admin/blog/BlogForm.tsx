@@ -37,6 +37,20 @@ type Props = {
   saving: boolean;
 };
 
+// Add this function near the top of the component, after imports
+function sanitizeBlocks(blocks: ContentBlock[]): ContentBlock[] {
+  return blocks.filter((block) => {
+    if (block.type === "image") {
+      return !!block.url?.trim();
+    }
+    if (block.type === "list") {
+      return (block.items ?? []).some((item) => item.trim() !== "");
+    }
+    // heading, paragraph, quote, code
+    return !!block.content?.trim();
+  });
+}
+
 export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
   const { categories, fetchCategories } = useCategoryStore();
   const [blocks, setBlocks]             = useState<ContentBlock[]>(post?.content ?? []);
@@ -83,11 +97,12 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
   }, [title, mode]);
 
   const handleFormSubmit = async (data: FormData, publishNow = false) => {
-    if (blocks.length === 0) {
-      alert("Please add at least one content block");
-      return;
-    }
-    await onSubmit(data, blocks, coverImage, publishNow);
+     const cleanBlocks = sanitizeBlocks(blocks);
+      if (cleanBlocks.length === 0) {
+          alert("Please add at least one content block with content");
+          return;
+        }
+    await onSubmit(data, cleanBlocks, coverImage, publishNow);
   };
 
   return (
