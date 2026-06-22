@@ -306,19 +306,34 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
               )}
             </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Category</Label>
-          <select
-            className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
-            {...register("categoryId")}
-          >
-            <option value="">None</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
+    <div className="space-y-1.5">
+  <div className="flex items-center justify-between">
+    <Label className="text-xs text-muted-foreground">Category</Label>
+    <button
+      type="button"
+      onClick={() => setCategoryModalOpen(true)}
+      className="flex items-center gap-1 text-xs text-brand hover:underline"
+    >
+      <Plus className="h-3 w-3" /> New
+    </button>
+  </div>
+  <select
+    className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
+    {...register("categoryId")}
+  >
+    <option value="">None</option>
+    {categories.map((c) => (
+      <option key={c.id} value={String(c.id)}>{c.name}</option>
+    ))}
+  </select>
+</div>
 
+{/* Add Category Modal */}
+<AddBlogCategoryModal
+  open={categoryModalOpen}
+  onClose={() => setCategoryModalOpen(false)}
+  onCreated={(newCategoryId) => setValue("categoryId", newCategoryId)}
+/>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">
                 Tags <span className="font-normal">(comma separated)</span>
