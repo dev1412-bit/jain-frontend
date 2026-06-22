@@ -47,9 +47,7 @@ function getFilteredProducts(
 
   if (selectedCategory !== "all") {
     result = result.filter(
-      (product) =>
-        getCategorySlug(product) === selectedCategory ||
-        product.category?.name === selectedCategory
+        (p) => p.category?.slug === selectedCategory
     );
   }
 

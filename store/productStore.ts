@@ -43,7 +43,7 @@ export type Product = {
   emiPrice?: number | null;
   status: "draft" | "published" | "archived";
   categoryId: string;
-  category?: { id: string; name: string };
+  category?: { id: string; name: string;   slug: string; };
   pricingPlans?: PricingPlan[];
   media?: ProductMedia[];
   seo?: ProductSeo | null;
