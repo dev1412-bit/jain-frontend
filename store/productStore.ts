@@ -86,9 +86,13 @@ export type CreateProductPayload = {
   };
 };
 
+
 type ProductStore = {
   // ── Admin ──
   products: Product[];
+  featuredProducts: Product[];
+  featuredLoading: boolean;
+  fetchFeaturedProducts: () => Promise<void>;
   loading: boolean;
   error: string | null;
   total: number;
@@ -124,7 +128,8 @@ export const useProductStore = create<ProductStore>()(
       error: null,
       total: 0,
       currentPage: 1,
-
+      featuredProducts: [],
+      featuredLoading: false,
       // ── Store state ──
       storeProducts: [],
       storeLoading: false,
@@ -132,6 +137,18 @@ export const useProductStore = create<ProductStore>()(
       selectedCategory: "all",
       searchQuery: "",
       sortBy: "default",
+
+
+      fetchFeaturedProducts: async () => {
+        set({ featuredLoading: true });
+        try {
+          const res = await api.get("/products/featured");
+          set({ featuredProducts: res.data.data ?? res.data, featuredLoading: false });
+        } catch {
+          set({ featuredLoading: false });
+        }
+      },
+ 
 
       // ── Admin actions ──
       fetchProducts: async (page = 1, search = "", category = "", status = "") => {
