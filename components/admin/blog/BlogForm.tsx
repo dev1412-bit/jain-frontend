@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Save, Globe } from "lucide-react";
+import { ArrowLeft, Save, Globe, Plus } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useBlogStore, type ContentBlock, type Blog } from "@/store/blogStore";
-import { useCategoryStore } from "@/store/categoryStore";
+import { useBlogCategoryStore } from "@/store/blogCategoryStore";
 import ContentBlockBuilder from "./ContentBlockBuilder";
 import ImageUpload from "./ImageUpload";
 import { cn } from "@/lib/utils";
+import AddBlogCategoryModal from "./AddBlogCategoryModal";
 
 const schema = z.object({
   title:           z.string().min(5, "Title must be at least 5 characters"),
@@ -52,11 +53,11 @@ function sanitizeBlocks(blocks: ContentBlock[]): ContentBlock[] {
 }
 
 export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
-  const { categories, fetchCategories } = useCategoryStore();
+  const { categories, fetchCategories } = useBlogCategoryStore();
   const [blocks, setBlocks]             = useState<ContentBlock[]>(post?.content ?? []);
   const [coverImage, setCoverImage]     = useState<string>(post?.coverImage ?? "");
   const [activeTab, setActiveTab]       = useState<"content" | "seo">("content");
-
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   useEffect(() => { fetchCategories(); }, []);
 
   // Pre-fill form when editing
@@ -305,18 +306,18 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
               )}
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Category</Label>
-              <select
-                className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
-                {...register("categoryId")}
-              >
-                <option value="">None</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={String(c.id)}>{c.name}</option>
-                ))}
-              </select>
-            </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Category</Label>
+          <select
+            className="w-full h-9 px-3 text-sm rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-brand/30"
+            {...register("categoryId")}
+          >
+            <option value="">None</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">

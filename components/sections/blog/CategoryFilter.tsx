@@ -1,13 +1,20 @@
 "use client";
 
+import { useEffect } from "react";
 import { useBlogStore } from "@/store/blogStore";
+import { useBlogCategoryStore } from "@/store/blogCategoryStore";
 import { cn } from "@/lib/utils";
 
 export default function CategoryFilter() {
-  const { categories, selectedCategory, setCategory } = useBlogStore();
+  const { selectedCategory, setCategory } = useBlogStore();
+  const { categories, fetchCategories } = useBlogCategoryStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const allCategories = [
-    { id: "all", name: "All" },
+    { id: "all", name: "All", slug: "all" },
     ...categories,
   ];
 
@@ -16,7 +23,7 @@ export default function CategoryFilter() {
       {allCategories.map((cat) => (
         <button
           key={cat.id}
-          onClick={() => setCategory(cat.name)}
+          onClick={() => setCategory(cat.slug === "all" ? "All" : cat.name)}
           className={cn(
             "px-4 py-1.5 rounded-full text-sm font-medium border transition-colors",
             selectedCategory === cat.name

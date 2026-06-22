@@ -8,7 +8,7 @@ import FeaturedPost from "@/components/sections/blog/FeaturedPost";
 import BlogCard from "@/components/sections/blog/BlogCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FileSearch } from "lucide-react";
-
+import { useBlogCategoryStore } from "@/store/blogCategoryStore";
 function BlogGridSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -36,19 +36,22 @@ export default function BlogPage() {
     error,
     searchQuery,
     fetchPosts,
-    fetchCategories,
+    selectedCategory,
   } = useBlogStore();
-
+  const { categories } = useBlogCategoryStore();
   useEffect(() => {
     fetchPosts();
-    fetchCategories();
   }, []);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchPosts(searchQuery ? { search: searchQuery } : {});
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+useEffect(() => {
+  const cat = categories.find((c) => c.name === selectedCategory);
+  const timer = setTimeout(() => {
+    fetchPosts({
+      search: searchQuery || undefined,
+      category: selectedCategory !== "All" ? cat?.slug : undefined,
+    });
+  }, 400);
+  return () => clearTimeout(timer);
+}, [searchQuery, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-background">
