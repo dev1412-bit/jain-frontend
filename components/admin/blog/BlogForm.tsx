@@ -77,7 +77,7 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
       slug:            post.slug,
       excerpt:         post.excerpt,
       authorName:      post.authorName,
-      categoryId:      post.category?.id ?? "",
+      categoryId:      post.category?.id ? String(post.category.id) : "",
       status:          post.status as any,
       featured:        post.featured,
       metaTitle:       post.metaTitle ?? "",
@@ -313,7 +313,7 @@ export default function BlogForm({ mode, post, onSubmit, saving }: Props) {
               >
                 <option value="">None</option>
                 {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={String(c.id)}>{c.name}</option>
                 ))}
               </select>
             </div>

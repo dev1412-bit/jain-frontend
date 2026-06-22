@@ -212,7 +212,21 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
 
   updatePost: async (id, data) => {
     try {
-      const res = await api.put(`/admin/blogs/${id}`, data);
+       const payload = {
+      title:            data.title,
+      slug:             data.slug,
+      excerpt:          data.excerpt,
+      content:          data.content,
+      cover_image:      data.coverImage,
+      status:           data.status,
+      featured:         data.featured,
+      author_name:      data.authorName,
+      category_id:      data.categoryId,
+      meta_title:       data.metaTitle,
+      meta_description: data.metaDescription,
+      tags:             data.tags,
+    };
+      const res = await api.put(`/admin/blogs/${id}`, payload);
       const updated = res.data.data ?? res.data;
       set((s) => ({
         adminPosts: s.adminPosts.map((p) => p.id === id ? updated : p),
