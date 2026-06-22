@@ -64,8 +64,8 @@ export default function FeaturedProductsSlider() {
   if (!featuredLoading && featuredProducts.length === 0) return null;
 
   return (
-    <section className="py-12 sm:py-16 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 sm:py-16 bg-[#f5f5f7] dark:bg-muted/40">
+      <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -108,9 +108,6 @@ export default function FeaturedProductsSlider() {
             </button>
           )}
 
-            {/* Edge fade gradients — hint there's more to scroll */}
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-[1]" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-[1]" />
           {/* Track */}
           <div
             ref={trackRef}

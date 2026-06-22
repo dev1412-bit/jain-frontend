@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function HeroSection() {
   return (
     <section className="w-full bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-0">
+      <div className="max-w-7xl mx-auto pt-16 pb-0">
 
         {/* Heading */}
         <div className="text-center max-w-3xl mx-auto">

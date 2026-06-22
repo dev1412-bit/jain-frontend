@@ -167,14 +167,15 @@ export default function BlogDetailPage() {
             {/* Cover image */}
             {currentPost.coverImage && (
               <div className="relative mt-6 aspect-video rounded-2xl overflow-hidden bg-muted">
-                <Image
-                  src={currentPost.coverImage}
-                  alt={currentPost.title}
-                  fill
-                  sizes="(max-width:768px) 100vw, 700px"
-                  className="object-cover"
-                  priority
-                />
+              {currentPost.coverImage && (
+                <div className="mt-6 aspect-video rounded-2xl overflow-hidden bg-muted">
+                  <img
+                    src={currentPost.coverImage}
+                    alt={currentPost.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
               </div>
             )}
 

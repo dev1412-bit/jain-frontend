@@ -68,7 +68,7 @@ type DashboardStore = {
   fetchStats:   () => Promise<void>;
   fetchRevenue: (period?: StatPeriod) => Promise<void>;
   fetchCategories: () => Promise<void>;
-
+exportDashboard:(period?:StatPeriod)=>Promise<void>;
   // 👇 analytics
   analyticsPeriod:      AnalyticsPeriod;
   revenueTrend:         RevenueTrendPoint[];
@@ -141,6 +141,39 @@ export const useAdminDashboardStore = create<DashboardStore>((set, get) => ({
       set({ categoryData: data });
     } catch {}
   },
+
+  exportDashboard: async(period)=>{
+
+ const p = period ?? get().period;
+
+
+ const res = await api.get(
+   `/admin/dashboard/export?period=${p}`,
+   {
+     responseType:"blob"
+   }
+ );
+
+
+ const url = window.URL.createObjectURL(
+    new Blob([res.data])
+ );
+
+
+ const link=document.createElement("a");
+
+ link.href=url;
+
+ link.download="dashboard-report.pdf";
+
+ document.body.appendChild(link);
+
+ link.click();
+
+ link.remove();
+
+
+},
 
   // ── analytics actions ──
   setAnalyticsPeriod: (p) => {

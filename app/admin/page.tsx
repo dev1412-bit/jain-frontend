@@ -14,7 +14,7 @@ import { useProductStore } from "@/store/productStore";
 
 
 export default function AdminOverviewPage() {
-  const { stats, loading, fetchStats, fetchRevenue, fetchCategories } = useAdminDashboardStore();
+  const { stats, loading, fetchStats, fetchRevenue, fetchCategories,exportDashboard } = useAdminDashboardStore();
   const { fetchOrders } = useOrderStore();
   const { fetchProducts } = useProductStore();
    useEffect(() => {
@@ -75,7 +75,7 @@ export default function AdminOverviewPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg text-xs h-8">
+          <Button variant="outline" size="sm" className="gap-1.5 rounded-lg text-xs h-8" onClick={()=>exportDashboard()}>
             <Download className="h-3.5 w-3.5" />
             Export
           </Button>
