@@ -22,6 +22,22 @@ export type BlogCategory = {
   slug: string;
 };
 
+// Add this new type near your other types
+type BlogUpdatePayload  = {
+  title?: string;
+  slug?: string;
+  excerpt?: string;
+  content?: ContentBlock[];
+  coverImage?: string;
+  status?: string;
+  featured?: boolean;
+  authorName?: string;
+  categoryId?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  tags?: string[];
+};
+
 export type Blog = {
   id: string;
   uuid: string;
@@ -39,6 +55,7 @@ export type Blog = {
   scheduledAt?: string;
   tags: string[];
   category?: BlogCategory;
+  categoryId?: string; 
   metaTitle?: string;
   metaDescription?: string;
   createdAt?: string;
@@ -84,7 +101,7 @@ type BlogStore = {
   fetchAdminPosts: (params?: { status?: string; search?: string; page?: number }) => Promise<void>;
   fetchAdminPost: (id: string) => Promise<Blog>;
   createPost: (data: Partial<Blog>) => Promise<void>;
-  updatePost: (id: string, data: Partial<Blog>) => Promise<void>;
+  updatePost: (id: string, data: BlogUpdatePayload) => Promise<void>;
   deletePost: (id: string) => Promise<void>;
   publishPost: (id: string) => Promise<void>;
   archivePost: (id: string) => Promise<void>;
@@ -194,7 +211,7 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
       status:           data.status,
       featured:         data.featured,
       author_name:      data.authorName,       
-      category_id:      data.category,      
+      category_id:      data.categoryId,      
       meta_title:       data.metaTitle,       
       meta_description: data.metaDescription,  
       tags:             data.tags,
@@ -210,9 +227,9 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
     }
   },
 
-  updatePost: async (id, data) => {
-    try {
-       const payload = {
+updatePost: async (id, data) => {
+  try {
+    const payload = {
       title:            data.title,
       slug:             data.slug,
       excerpt:          data.excerpt,
@@ -226,17 +243,17 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
       meta_description: data.metaDescription,
       tags:             data.tags,
     };
-      const res = await api.put(`/admin/blogs/${id}`, payload);
-      const updated = res.data.data ?? res.data;
-      set((s) => ({
-        adminPosts: s.adminPosts.map((p) => p.id === id ? updated : p),
-      }));
-      toast.success("Post updated!");
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update post");
-      throw err;
-    }
-  },
+    const res = await api.put(`/admin/blogs/${id}`, payload);
+    const updated = res.data.data ?? res.data;
+    set((s) => ({
+      adminPosts: s.adminPosts.map((p) => p.id === id ? updated : p),
+    }));
+    toast.success("Post updated!");
+  } catch (err: any) {
+    toast.error(err?.response?.data?.message || "Failed to update post");
+    throw err;
+  }
+},
 
   deletePost: async (id) => {
     try {
