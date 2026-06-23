@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { ShieldCheck, ArrowRight, Loader2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { useOrderStore } from "@/store/orderStore";
 import { useState, useEffect } from "react";
+import api from "@/lib/axios";
 
 const GST_RATE = 0.18;
 
@@ -17,85 +17,158 @@ type Props = {
   couponCode?: string | null;
 };
 
-export default function ReviewStep({ onBack, onPlaceOrder, billingData, paymentMethodText = "card", couponCode = null }: Props) {
+// load Razorpay script only once globally
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (document.getElementById("razorpay-script")) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.id    = "razorpay-script";
+    script.src   = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload  = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+export default function ReviewStep({
+  onBack, onPlaceOrder, billingData,
+  paymentMethodText = "card", couponCode = null
+}: Props) {
   const { items, total, clearCart } = useCartStore();
-  const placeOrder = useOrderStore((state) => state.placeOrder);
-  
-  // Track loading and clear user-friendly status messages
-  const [loading, setLoading] = useState(false);
+  const { placeOrder } = useOrderStore();
+
+  const [loading,        setLoading]        = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
 
   const subtotal   = total();
   const gst        = +(subtotal * GST_RATE).toFixed(2);
   const grandTotal = +(subtotal + gst).toFixed(2);
 
-  // Inject Razorpay base core scripts on mount safely
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+  // ❌ REMOVED: useEffect that loaded script on every mount
 
   const handlePlace = async () => {
     setLoading(true);
-    setLoadingMessage("Initializing secure checkout session...");
+    setLoadingMessage("Initializing secure checkout...");
 
     try {
-      // Map data properties safely matching your explicit Laravel rules schema
+      // 1. load script only if not already loaded
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        throw new Error("Failed to load Razorpay. Check your internet connection.");
+      }
+
       const payload = {
         billing: {
           first_name: billingData?.firstName,
-          last_name: billingData?.lastName || "",
-          email: billingData?.email,
-          phone: billingData?.phone,
-          company: billingData?.company || "",
-          address: billingData?.address,
-          city: billingData?.city,
-          state: billingData?.state,
-          pin_code: billingData?.pinCode,
-          country: billingData?.country,
+          last_name:  billingData?.lastName  || "",
+          email:      billingData?.email,
+          phone:      billingData?.phone,
+          company:    billingData?.company   || "",
+          address:    billingData?.address,
+          city:       billingData?.city,
+          state:      billingData?.state,
+          pin_code:   billingData?.pinCode,
+          country:    billingData?.country,
         },
-        items: items.map(item => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
+        items: items.map((item) => ({
+          id:       item.id,
+          name:     item.name,
+          price:    item.price,
           quantity: item.quantity,
-          slug: item.slug || "product-slug",
+          slug:     item.slug || "product-slug",
+          plan_id:     item.planId     ?? null, // 👈
+          plan_name:   item.planName   ?? null, // 👈
+          plan_period: item.planPeriod ?? null, // 👈
         })),
-        coupon_code: couponCode,
+        coupon_code:    couponCode,
         payment_method: paymentMethodText,
       };
 
-      // Change loading message right before popup triggers
-      setTimeout(() => {
-        setLoadingMessage("Opening secure payment portal window...");
-      }, 1000);
+      // 2. create order on backend — get gateway data back
+      setLoadingMessage("Creating your order...");
+      const res = await api.post("/checkout", payload);
+      const { order, gateway } = res.data;
 
-      // Note: We need to adapt the store call slightly or handle the status change 
-      // dynamically. To ensure the message changes when verifying, we can handle it here or let the store execute.
-      const completeOrder = await placeOrder(payload);
-      
-      setLoadingMessage("Payment authorized! Finalizing your order...");
-      
-      clearCart(); 
-      onPlaceOrder(completeOrder); 
-    } catch (error) {
-      // Errors are caught and handled inside the store's toast system safely
+      if (!gateway?.id) {
+        throw new Error("Failed to initialize payment gateway.");
+      }
+
+      // 3. open Razorpay modal
+      setLoadingMessage("Opening payment portal...");
+      setLoading(false); // hide overlay so Razorpay modal is visible
+
+      await new Promise<void>((resolve, reject) => {
+        const options = {
+          key:         gateway.key,
+          amount:      gateway.amount,
+          currency:    gateway.currency,
+          order_id:    gateway.id,
+          name:        gateway.name ?? "JainSoftware",
+          description: "Order Payment",
+          prefill: {
+            name:    gateway.prefill?.name,
+            email:   gateway.prefill?.email,
+            contact: gateway.prefill?.contact,
+          },
+          theme: { color: "#d4006e" },
+
+          // 4. on success — verify with backend
+          handler: async (response: any) => {
+            setLoading(true);
+            setLoadingMessage("Verifying payment...");
+            try {
+              const verifyRes = await api.post("/checkout/verify", {
+                internal_order_id:   order.id,
+                razorpay_order_id:   response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature:  response.razorpay_signature,
+              });
+
+              if (verifyRes.data.success) {
+                setLoadingMessage("Payment confirmed! Finalizing...");
+                clearCart();
+                onPlaceOrder(verifyRes.data.data);
+                resolve();
+              } else {
+                throw new Error("Payment verification failed.");
+              }
+            } catch (err) {
+              reject(err);
+            }
+          },
+
+          // 5. on dismiss — user closed modal
+          modal: {
+            ondismiss: () => {
+              reject(new Error("Payment cancelled by user."));
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      });
+
+    } catch (error: any) {
       setLoading(false);
       setLoadingMessage("");
+      // toast shown in store or here
+      if (error?.message && error.message !== "Payment cancelled by user.") {
+        const { toast } = await import("sonner");
+        toast.error(error.message);
+      }
     }
   };
 
   return (
     <div className="space-y-5 relative">
-      
-      {/* ── USER FRIENDLY FULL SCREEN OVERLAY ── */}
+
+      {/* Loading overlay */}
       {loading && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center animate-fade-in">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-md flex flex-col items-center justify-center">
           <div className="bg-card border border-border p-8 rounded-2xl shadow-xl max-w-sm w-full text-center space-y-4 flex flex-col items-center">
             <div className="p-3 bg-brand/10 text-brand rounded-full animate-bounce">
               <Lock className="h-6 w-6" />
@@ -108,7 +181,7 @@ export default function ReviewStep({ onBack, onPlaceOrder, billingData, paymentM
               </p>
             </div>
             <p className="text-[11px] text-destructive font-medium animate-pulse">
-              Please do not refresh or close this browser window.
+              Please do not refresh or close this window.
             </p>
           </div>
         </div>
@@ -119,18 +192,21 @@ export default function ReviewStep({ onBack, onPlaceOrder, billingData, paymentM
       {/* Items */}
       <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
         {items.map((item) => (
-          <div key={item.id} className="flex items-center gap-3 py-3 border-b border-border last:border-0">
-            <div className="relative w-16 h-11 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
-              <Image
-                src={item.image || "https://placehold.co/64x44/1e1b4b/818cf8?text=P"}
-                alt={item.name}
-                fill
-                sizes="64px"
-                className="object-cover"
-              />
+          <div key={item.id}
+            className="flex items-center gap-3 py-3 border-b border-border last:border-0">
+            <div className="w-16 h-11 rounded-lg overflow-hidden bg-muted shrink-0 border border-border">
+              {item.image ? (
+                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-brand/10">
+                  <span className="text-brand/40 text-xs font-bold">{item.name.charAt(0)}</span>
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{item.name.split("(")[0].trim()}</p>
+              <p className="text-sm font-semibold text-foreground truncate">
+                {item.name.split("(")[0].trim()}
+              </p>
               {item.name.includes("(") && (
                 <span className="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand/10 text-brand">
                   {item.name.match(/\(([^)]+)\)/)?.[1]}
@@ -147,7 +223,7 @@ export default function ReviewStep({ onBack, onPlaceOrder, billingData, paymentM
         ))}
       </div>
 
-      {/* Summary calculations */}
+      {/* Summary */}
       <div className="space-y-2.5 text-sm pt-1">
         <h3 className="font-bold text-foreground">Order Summary</h3>
         <div className="flex justify-between text-foreground">
@@ -174,9 +250,9 @@ export default function ReviewStep({ onBack, onPlaceOrder, billingData, paymentM
         </div>
       </div>
 
-      {/* Actions */}
       <div className="grid grid-cols-2 gap-3">
-        <Button variant="outline" onClick={onBack} disabled={loading} className="h-11 rounded-xl font-semibold">
+        <Button variant="outline" onClick={onBack} disabled={loading}
+          className="h-11 rounded-xl font-semibold">
           Back
         </Button>
         <Button

@@ -30,12 +30,16 @@ const wished =  isWishlisted(product.id);
   //   : null;
   const displayPrice = product.emiPrice ?? price;
   const handleAddToCart = () => {
+    const firstPlan = product.pricingPlans?.[0];
      addItem({
       id: product.id,
       name,
       price: displayPrice,
       image: image ?? "",
       slug,
+      planId:     firstPlan?.id     ?? null,  // 👈
+      planName:   firstPlan?.planName ?? null, // 👈
+      planPeriod: firstPlan?.period  ?? null, // 👈
     });
   };
 

@@ -80,7 +80,8 @@ type BlogStore = {
   pagination: PaginationMeta | null;
   loading: boolean;
   error: string | null;
-
+  detailLoading: boolean;
+    detailError: string | null;
   // Filters
   searchQuery: string;
   selectedCategory: string;
@@ -116,12 +117,14 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
   pagination: null,
   loading: false,
   error: null,
+  detailLoading: false,
+  detailError: null,
   searchQuery: "",
   selectedCategory: "All",
   adminPosts: [],
   adminLoading: false,
 
-  // ── Public ─────────────────────────────────
+  
   fetchPosts: async (params = {}) => {
     set({ loading: true, error: null });
     try {
@@ -152,12 +155,12 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
   },
 
   fetchPost: async (slug) => {
-    set({ loading: true, currentPost: null });
+    set({ detailLoading: true, detailError: null, currentPost: null });
     try {
       const res = await api.get(`/blogs/${slug}`);
-      set({ currentPost: res.data.data ?? res.data, loading: false });
+      set({ currentPost: res.data.data ?? res.data, detailLoading: false });
     } catch {
-      set({ error: "Post not found", loading: false });
+      set({ detailError: "Post not found", detailLoading: false });
     }
   },
 
@@ -168,22 +171,38 @@ export const useBlogStore = create<BlogStore>((set, get) => ({
     } catch {}
   },
 
-  likePost: async (id) => {
-    try {
-      const res = await api.post(`/blogs/${id}/like`);
-      // update likes count in currentPost
-      set((s) => ({
-        currentPost: s.currentPost?.id === id
-          ? { ...s.currentPost, likesCount: res.data.likes_count }
-          : s.currentPost,
-      }));
-    } catch {}
-  },
+// Inside your blogStore.ts file
+likePost: async (id: string) => {
+  try {
+    const res = await api.post(`/blogs/${id}/like`);
+    
+    // Grab the verified new count directly from the backend response payload
+    const updatedLikesCount = res.data.likes_count;
+
+    set((state) => {
+      // 1. Update the counter if the user is looking at the details page
+      const updatedCurrentPost = state.currentPost?.id === id
+        ? { ...state.currentPost, likesCount: updatedLikesCount }
+        : state.currentPost;
+
+      // 2. Also update the counter inside the main listings array if it exists there
+      const updatedPosts = state.posts.map((post) =>
+        post.id === id ? { ...post, likesCount: updatedLikesCount } : post
+      );
+
+      return {
+        currentPost: updatedCurrentPost,
+        posts: updatedPosts,
+      };
+    });
+  } catch (error) {
+    console.error("Failed to register like action:", error);
+  }
+},
 
   setSearch:   (q)   => set({ searchQuery: q }),
   setCategory: (cat) => set({ selectedCategory: cat }),
 
-  // ── Admin ───────────────────────────────────
   fetchAdminPosts: async (params = {}) => {
     set({ adminLoading: true });
     try {

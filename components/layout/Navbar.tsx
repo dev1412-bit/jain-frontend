@@ -85,9 +85,6 @@ export default function Navbar() {
                 e.currentTarget.style.display = "none";
               }}
             />
-            {/* <span className="font-bold text-lg tracking-tight text-foreground">
-              Jain<span className="text-brand">Software</span>
-            </span> */}
           </Link>
 
           {/* ── CENTER: Desktop Nav ── */}

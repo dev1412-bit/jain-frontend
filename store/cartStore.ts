@@ -10,6 +10,9 @@ export type CartItem = {
   image: string;
   slug: string;
   quantity: number;
+  planId?: string | null;       // 👈 add
+  planName?: string | null;     // 👈 add
+  planPeriod?: string | null; 
 };
 
 type CartStore = {

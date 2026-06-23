@@ -21,8 +21,8 @@ export default function BlogDetailPage() {
   const {
     currentPost,
     posts,
-    loading,
-    error,
+    detailLoading,
+    detailError,
     fetchPost,
     fetchPosts,
     likePost,
@@ -30,6 +30,7 @@ export default function BlogDetailPage() {
 
   const [liked, setLiked] = useState(false);
 
+  // Core content retrieval trigger
   useEffect(() => {
     if (slug) {
       fetchPost(slug);
@@ -37,10 +38,33 @@ export default function BlogDetailPage() {
     }
   }, [slug]);
 
+  // FIX: Reset local visual state dynamically when navigating between different blogs
+  useEffect(() => {
+    if (currentPost) {
+      const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
+      if (likedBlogs.includes(currentPost.id)) {
+        setLiked(true);
+      } else {
+        setLiked(false); // Make sure it defaults back to false for unliked pages!
+      }
+    }
+  }, [currentPost, slug]); // Watches both post content modifications and route shifts
+
   const handleLike = async () => {
-    if (!liked && currentPost) {
-      await likePost(currentPost.id);
-      setLiked(true);
+    if (!currentPost) return;
+
+    // Visually toggle it on immediately for smooth user interaction
+    setLiked(true);
+
+    // Hit the API endpoint silently. If they already liked it, 
+    // the backend returns a successful 200 response with the unchanged count.
+    await likePost(currentPost.id);
+    
+    // Track page action history locally
+    const likedBlogs = JSON.parse(localStorage.getItem("liked_blogs") || "[]");
+    if (!likedBlogs.includes(currentPost.id)) {
+      likedBlogs.push(currentPost.id);
+      localStorage.setItem("liked_blogs", JSON.stringify(likedBlogs));
     }
   };
 
@@ -48,7 +72,7 @@ export default function BlogDetailPage() {
     navigator.clipboard.writeText(window.location.href);
   };
 
-  // Related posts — same category, exclude current
+  // Related posts selection filters
   const related = posts
     .filter((p) =>
       p.slug !== slug &&
@@ -56,10 +80,17 @@ export default function BlogDetailPage() {
     )
     .slice(0, 3);
 
-  // Loading state
-  if (loading) {
+  const storageBase = process.env.NEXT_PUBLIC_BASE_URL + "/storage/app/public/";
+
+  const coverImageUrl = currentPost?.coverImage
+    ? currentPost.coverImage.startsWith("http")
+      ? currentPost.coverImage
+      : `${storageBase}/${currentPost.coverImage}`
+    : null;
+
+  if (detailLoading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <Skeleton className="h-4 w-32 mb-6" />
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8">
           <div className="space-y-4">
@@ -77,7 +108,7 @@ export default function BlogDetailPage() {
     );
   }
 
-  if (error || !currentPost) {
+  if (detailError || !currentPost) {
     return (
       <div className="text-center py-24 px-4">
         <p className="text-muted-foreground text-sm">Post not found.</p>
@@ -90,7 +121,7 @@ export default function BlogDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
@@ -101,12 +132,11 @@ export default function BlogDetailPage() {
           <span className="text-foreground line-clamp-1 max-w-[200px]">{currentPost.title}</span>
         </nav>
 
-        {/* Main grid: content + sidebar */}
+        {/* Main content grid split */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-8 items-start">
 
           {/* ── LEFT: Main content ── */}
           <article>
-            {/* Category + Featured badges */}
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               {currentPost.category && (
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-brand/10 text-brand">
@@ -120,14 +150,11 @@ export default function BlogDetailPage() {
               )}
             </div>
 
-            {/* Title */}
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground leading-tight">
               {currentPost.title}
             </h1>
 
-            {/* Meta row */}
             <div className="flex flex-wrap items-center gap-4 mt-4 pb-5 border-b border-border">
-              {/* Author */}
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white text-xs font-semibold shrink-0">
                   {currentPost.authorName?.slice(0, 2).toUpperCase()}
@@ -154,7 +181,6 @@ export default function BlogDetailPage() {
                 {Math.ceil((currentPost.content?.length ?? 1) * 0.5)} min read
               </div>
 
-              {/* Share */}
               <button
                 onClick={handleShare}
                 className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -164,27 +190,20 @@ export default function BlogDetailPage() {
               </button>
             </div>
 
-            {/* Cover image */}
-            {currentPost.coverImage && (
-              <div className="relative mt-6 aspect-video rounded-2xl overflow-hidden bg-muted">
-              {currentPost.coverImage && (
-                <div className="mt-6 aspect-video rounded-2xl overflow-hidden bg-muted">
-                  <img
-                    src={currentPost.coverImage}
-                    alt={currentPost.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+            {coverImageUrl && (
+              <div className="mt-6 aspect-video rounded-2xl overflow-hidden bg-muted">
+                <img
+                  src={coverImageUrl}
+                  alt={currentPost.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
 
-            {/* Excerpt */}
             <p className="mt-6 text-base text-muted-foreground leading-relaxed border-l-4 border-brand pl-4 bg-brand/5 py-3 rounded-r-lg">
               {currentPost.excerpt}
             </p>
 
-            {/* Content blocks */}
             <div className="mt-8">
               {currentPost.content && currentPost.content.length > 0 ? (
                 <RenderContent blocks={currentPost.content} />
@@ -193,7 +212,6 @@ export default function BlogDetailPage() {
               )}
             </div>
 
-            {/* Tags */}
             {currentPost.tags && currentPost.tags.length > 0 && (
               <div className="mt-10 pt-6 border-t border-border">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -210,7 +228,6 @@ export default function BlogDetailPage() {
               </div>
             )}
 
-            {/* Like + Back row */}
             <div className="mt-8 pt-6 border-t border-border flex items-center justify-between gap-4">
               <button
                 onClick={() => router.back()}
@@ -220,25 +237,24 @@ export default function BlogDetailPage() {
                 Back to Blog
               </button>
 
+              {/* FIX: REMOVED disabled PROPERT AND REMOVED cursor-not-allowed STYLE */}
               <button
                 onClick={handleLike}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all active:scale-95",
                   liked
-                    ? "bg-brand/10 text-brand border-brand/30"
-                    : "border-border text-muted-foreground hover:border-brand/30 hover:text-brand"
+                    ? "bg-red-500/10 text-red-500 border-red-500/30"
+                    : "border-border text-muted-foreground hover:border-red-500/30 hover:text-red-500"
                 )}
               >
-                <Heart className={cn("h-4 w-4", liked && "fill-brand")} />
-                {(currentPost.likesCount ?? 0) + (liked ? 1 : 0)} Likes
+                <Heart className={cn("h-4 w-4 transition-transform", liked && "fill-red-500 text-red-500")} />
+                <span>{currentPost.likesCount ?? 0} Likes</span>
               </button>
             </div>
           </article>
 
           {/* ── RIGHT: Sidebar ── */}
           <aside className="space-y-5 lg:sticky lg:top-20">
-
-            {/* Author card */}
             <div className="bg-background border border-border rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-foreground mb-3">About the Author</h3>
               <div className="flex items-center gap-3">
@@ -252,7 +268,6 @@ export default function BlogDetailPage() {
               </div>
             </div>
 
-            {/* Post stats */}
             <div className="bg-background border border-border rounded-2xl p-5 space-y-3">
               <h3 className="text-sm font-semibold text-foreground">Post Stats</h3>
               <div className="flex items-center justify-between text-sm">
@@ -265,8 +280,8 @@ export default function BlogDetailPage() {
                 <span className="text-muted-foreground flex items-center gap-1.5">
                   <Heart className="h-3.5 w-3.5" /> Likes
                 </span>
-                <span className="font-semibold text-foreground">
-                  {currentPost.likesCount + (liked ? 1 : 0)}
+                <span className={cn("font-semibold transition-colors", liked ? "text-red-500" : "text-foreground")}>
+                  {currentPost.likesCount ?? 0}
                 </span>
               </div>
               {currentPost.publishedAt && (
@@ -279,7 +294,6 @@ export default function BlogDetailPage() {
               )}
             </div>
 
-            {/* Tags sidebar */}
             {currentPost.tags && currentPost.tags.length > 0 && (
               <div className="bg-background border border-border rounded-2xl p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-3">Tags</h3>
@@ -296,7 +310,6 @@ export default function BlogDetailPage() {
               </div>
             )}
 
-            {/* Share card */}
             <div className="bg-background border border-border rounded-2xl p-5">
               <h3 className="text-sm font-semibold text-foreground mb-3">Share this post</h3>
               <Button
@@ -312,7 +325,7 @@ export default function BlogDetailPage() {
           </aside>
         </div>
 
-        {/* ── Related Posts ── */}
+        {/* Related Posts display row */}
         {related.length > 0 && (
           <div className="mt-16 pt-8 border-t border-border">
             <div className="flex items-center justify-between mb-6">

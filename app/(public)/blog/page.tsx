@@ -39,9 +39,7 @@ export default function BlogPage() {
     selectedCategory,
   } = useBlogStore();
   const { categories } = useBlogCategoryStore();
-  useEffect(() => {
-    fetchPosts();
-  }, []);
+
 useEffect(() => {
   const cat = categories.find((c) => c.name === selectedCategory);
   const timer = setTimeout(() => {

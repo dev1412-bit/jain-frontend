@@ -12,18 +12,6 @@ export default function CartItemRow({ item }: Props) {
   return (
     <div className="flex items-center gap-4 bg-background border border-border rounded-2xl p-4">
 
-      {/* Product image */}
-      {/* <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
-        <Image
-          src={item.image || "https://placehold.co/96x64/1e1b4b/818cf8?text=Product"}
-          alt={item.name}
-          fill
-          sizes="96px"
-          className="object-cover"
-        />
-      </div> */}
-
-      {/* Product image */}
       <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-muted shrink-0">
         {item.image ? (
           <img

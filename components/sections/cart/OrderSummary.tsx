@@ -29,16 +29,6 @@ const {
   const [couponError,   setCouponError]   = useState("");
   const [applyingCoupon, setApplyingCoupon] = useState(false);
 
-  // const subtotal    = total();
-  // const discountAmt = couponDiscount > 0
-  //   ? couponType === "percentage"
-  //     ? +(subtotal * (couponDiscount / 100)).toFixed(2)
-  //     : couponDiscount
-  //   : 0;
-  // const afterDisc   = subtotal - discountAmt;
-  // const gst         = +(afterDisc * GST_RATE).toFixed(2);
-  // const grandTotal  = +(afterDisc + gst).toFixed(2);
-
   const subtotal = getSubtotal();
 
 const discountAmt = discountAmount();

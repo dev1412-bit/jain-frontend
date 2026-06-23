@@ -5,7 +5,7 @@ import {
   FaGithub,
   FaYoutube,
 } from "react-icons/fa";
-
+import Image from "next/image";
 const footerLinks = {
   Products: [
     { label: "SaaS Solutions", href: "/store?category=saas" },
@@ -67,13 +67,17 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-brand flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-                </svg>
+              <div className="w-8 h-8 rounded-lg  flex items-center justify-center">
+                <Image
+                  src="/logo.png"
+                  alt="JainSoftware Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-lg"
+                />
               </div>
               <span className="font-bold text-lg tracking-tight">
-                Jain<span className="text-brand">Software</span>
+                Jain <span className="text-brand">Software</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-5 max-w-xs">
