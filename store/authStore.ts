@@ -8,7 +8,15 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: Role
+  role: Role;
+  phone?: string;    
+  company?: string;  
+  address?: string;  
+  city?: string;     
+  state?: string;    
+  pin_code?: string; 
+  country?: string;  
+  
 };
 
 type AuthStore = {
