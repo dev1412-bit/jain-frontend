@@ -277,7 +277,7 @@ export default function CheckoutPage() {
         payment_method: paymentMethod,
       });
       useCartStore.getState().clearCart();
-      router.push(`/checkout/success?order=${order.uuid}`);
+      router.push(`/billing/success?order=${order.uuid}`);
     } catch {
       // error in store
     } finally {

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import CheckoutSuccessPage from "@/components/sections/checkout/CheckoutSuccessPage";
-
+export const dynamic = "force-dynamic"; 
 export default function Page() {
   return (
     <Suspense fallback={
