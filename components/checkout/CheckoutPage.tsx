@@ -211,13 +211,13 @@ export default function CheckoutPage() {
       first_name: nameParts[0] ?? "",
       last_name:  nameParts.slice(1).join(" ") ?? "",
       email:      user?.email ?? "",
-      phone:      user?.phone                 ?? "",     // 👈
-      company:    user?.company               ?? "",     // 👈
-      address:    user?.address               ?? "",     // 👈
-      city:       user?.city                  ?? "",     // 👈
-      state:      user?.state                 ?? "",     // 👈
-      pin_code:   user?.pin_code              ?? "",     // 👈
-      country:    user?.country               ?? "India",// 👈
+      phone:      user?.phone                 ?? "",     
+      company:    user?.company               ?? "",     
+      address:    user?.address               ?? "",     
+      city:       user?.city                  ?? "",     
+      state:      user?.state                 ?? "",     
+      pin_code:   user?.pin_code              ?? "",     
+      country:    user?.country               ?? "India",
     },
   });
 
