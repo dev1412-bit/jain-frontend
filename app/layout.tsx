@@ -54,25 +54,29 @@ const RADIUS_MAP: Record<string, string> = {
 function buildThemeOverrideCSS(theme: any): string {
   if (!theme) return "";
 
-  const root: string[] = [];
-  const dark: string[] = [];
+  const always: string[] = [];     // applies in both modes (single-value settings like brand color, radius, font)
+  const lightOnly: string[] = [];  // applies ONLY when dark mode is off
+  const darkOnly: string[] = [];   // applies ONLY when dark mode is on
 
-  if (theme.primary_color)          root.push(`--brand: ${theme.primary_color};`);
-  if (theme.secondary_color)        root.push(`--brand-secondary: ${theme.secondary_color};`);
-  if (theme.accent_color)           root.push(`--brand-accent: ${theme.accent_color};`);
-  if (theme.background_color)       root.push(`--background: ${theme.background_color};`);
-  if (theme.text_color)             root.push(`--foreground: ${theme.text_color};`);
-  if (theme.dark_background_color)  dark.push(`--background: ${theme.dark_background_color};`);
+  if (theme.primary_color)   always.push(`--brand: ${theme.primary_color};`);
+  if (theme.secondary_color) always.push(`--brand-secondary: ${theme.secondary_color};`);
+  if (theme.accent_color)    always.push(`--brand-accent: ${theme.accent_color};`);
+
+  if (theme.background_color) lightOnly.push(`--background: ${theme.background_color};`);
+  if (theme.text_color)       lightOnly.push(`--foreground: ${theme.text_color};`);
+
+  if (theme.dark_background_color) darkOnly.push(`--background: ${theme.dark_background_color};`);
 
   const radius = RADIUS_MAP[theme.border_radius];
-  if (radius) root.push(`--radius: ${radius};`);
+  if (radius) always.push(`--radius: ${radius};`);
 
   const fontVar = FONT_VAR_MAP[theme.font_family];
-  if (fontVar) root.push(`--font-sans: ${fontVar};`);
+  if (fontVar) always.push(`--font-sans: ${fontVar};`);
 
   let css = "";
-  if (root.length) css += `html:root { ${root.join(" ")} }\n`;
-  if (dark.length) css += `html.dark { ${dark.join(" ")} }\n`;
+  if (always.length)    css += `html:root { ${always.join(" ")} }\n`;
+  if (lightOnly.length) css += `html:root:not(.dark) { ${lightOnly.join(" ")} }\n`;
+  if (darkOnly.length)  css += `html:root.dark { ${darkOnly.join(" ")} }\n`;
   return css;
 }
 

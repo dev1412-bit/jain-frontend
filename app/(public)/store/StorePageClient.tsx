@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronDown, Menu, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -84,13 +85,17 @@ export default function StorePageClient({
   initialCategories,
   initialError,
 }: StorePageClientProps) {
+  const searchParams = useSearchParams();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("search") ?? "");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("default");
   const [activeSort, setActiveSort] = useState("Default");
   const [activeFilter, setActiveFilter] = useState("All");
 
+  useEffect(() => {
+    setSearchQuery(searchParams.get("search") ?? "");
+  }, [searchParams]);
   const products = useMemo(
     () =>
       getFilteredProducts(

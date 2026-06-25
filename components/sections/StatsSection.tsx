@@ -8,7 +8,7 @@ const stats = [
 export default function StatsSection()
 {
     return(
-    <section className="w-full py-10">
+    <section className="w-full py-10 bg-card">
         <div className="max-w-7xl mx-auto">
             <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-4">
                 {stats.map(({ value, label }) => (

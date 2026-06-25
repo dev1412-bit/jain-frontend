@@ -26,13 +26,8 @@ export default function AfterHeroSection() {
             </Link>
           </div>
         </div>
-
-        {/* Image Mockup Wrapper */}
         <div className="mt-12 relative mx-auto max-w-5xl">
-          {/* Background Glow */}
           <div className="absolute inset-x-10 top-4 h-32 bg-brand/10 blur-3xl rounded-full pointer-events-none" />
-          
-          {/* Main Image Container */}
           <div className="relative rounded-xl border border-border shadow-2xl shadow-black/10 overflow-hidden bg-muted mb-5">
             <Image
               src="/code.png"
@@ -44,7 +39,6 @@ export default function AfterHeroSection() {
             />
             
             {/* ─── FIXED: Moved gradient inside the overflow-hidden parent ─── */}
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
           </div>
         </div>
 
