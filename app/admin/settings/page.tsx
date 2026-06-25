@@ -520,7 +520,7 @@ const [form, setForm] = useState<{
     dark_background_color: string;
     text_color: string;
     dark_mode_default: boolean;
-    border_radius: "none" | "small" | "medium" | "large" | "full"; // ◄── Allows all radii variants
+    border_radius: "none" | "small" | "medium" | "large" | "full"; 
     font_family: string;
   }>({
     primary_color: "#be1966", 
