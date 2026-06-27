@@ -160,7 +160,7 @@ export const useOrderStore = create<OrderStore>()(
           const res = await api.post(`/user/orders/${id}/cancel`);
           const updated: Order = res.data.data;
           set((s) => ({
-            myOrders: s.myOrders.map((o) => (o.id === id ? updated : o)),
+            myOrders: s.myOrders.map((o) => (o.uuid === id ? updated : o)),
           }));
           toast.success(res.data.message ?? "Order cancelled.");
         } catch (err: any) {

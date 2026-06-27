@@ -58,8 +58,8 @@ const onSubmit = async (data: SignInForm) => {
     });
     const role = res.user.role as Role;
     setAuth(res.user, role);
-    setLoggedIn(true);        // 👈 tell cart user is now logged in
-    await mergeGuestCart();   // 👈 merge local cart into DB
+    setLoggedIn(true);        
+    await mergeGuestCart(); 
     await fetchWishlist(); 
     closeSignIn();
     reset();
@@ -88,6 +88,10 @@ const onSubmit = async (data: SignInForm) => {
   } finally {
     setLoading(false);
   }
+};
+
+const handleSocialLogin = (provider: "google" | "github") => {
+  window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/${provider}/redirect`;
 };
 
   const handleClose = () => {
@@ -137,12 +141,7 @@ const onSubmit = async (data: SignInForm) => {
 
         <div className="px-6 py-5 space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-sm font-medium gap-2"
-              type="button"
-            >
+            <Button variant="outline" size="sm" className="h-9 text-sm font-medium gap-2" type="button" onClick={() => handleSocialLogin("google")}>
               <svg className="h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -163,12 +162,7 @@ const onSubmit = async (data: SignInForm) => {
               </svg>
               Google
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-9 text-sm font-medium gap-2"
-              type="button"
-            >
+           <Button variant="outline" size="sm" className="h-9 text-sm font-medium gap-2" type="button" onClick={() => handleSocialLogin("github")}>
               <FaGithub className="h-4 w-4" />
               GitHub
             </Button>

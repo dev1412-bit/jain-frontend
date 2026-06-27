@@ -151,7 +151,7 @@ export default function MyOrdersPage() {
       )}
 
       {/* Modals Mounting */}
-      <CancelOrderModal open={cancelModal.open} onClose={() => setCancelModal({ open: false, order: null })} orderId={cancelModal.order?.id ?? ""} orderUuid={cancelModal.order?.orderId ?? ""} />
+      <CancelOrderModal open={cancelModal.open} onClose={() => setCancelModal({ open: false, order: null })} orderId={cancelModal.order?.uuid ?? ""} orderUuid={cancelModal.order?.orderId ?? ""} />
       <LicenseModal isOpen={!!activeLicenseOrder} onClose={() => setActiveLicenseOrder(null)} order={activeLicenseOrder} />
       <SupportModal isOpen={!!activeSupportOrder} onClose={() => setActiveSupportOrder(null)} order={activeSupportOrder} />
     </div>
