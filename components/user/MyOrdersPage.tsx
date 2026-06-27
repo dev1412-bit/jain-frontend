@@ -55,6 +55,19 @@ export default function MyOrdersPage() {
     return diffInDays < 10;
   };
 
+  const handleDownloadInvoice = async (orderId: string) => {
+    try {
+      const res = await api.get(`/invoices/${orderId}`, {
+        responseType: "blob",
+      });
+      const blobUrl = URL.createObjectURL(res.data);
+      window.open(blobUrl, "_blank");
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch (err) {
+      toast.error("Failed to download invoice");
+    }
+  };
+
   const handleCancelClick = (order: Order) => {
     if (!canCancel(order)) {
       if (["cancelled", "refunded"].includes(order.status)) {
@@ -143,7 +156,10 @@ export default function MyOrdersPage() {
             {/* Actions */}
             {expandedId === order.id && (
               <div className="px-5 pb-4 flex items-center gap-2 bg-muted/10 flex-wrap">
-                <button onClick={() => window.open(`${process.env.NEXT_PUBLIC_API_URL}/invoices/${order.id}`, "_blank")} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-background hover:bg-accent"><Download className="h-3.5 w-3.5" /> Download Invoice</button>
+                <button
+                  onClick={() => handleDownloadInvoice(order.id)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-background hover:bg-accent">
+                  <Download className="h-3.5 w-3.5" /> Download Invoice</button>
                 <button onClick={() => setActiveLicenseOrder(order)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-background hover:bg-accent"><ExternalLink className="h-3.5 w-3.5" /> View License</button>
                 <button onClick={() => setActiveSupportOrder(order)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border bg-background hover:bg-accent"><Headphones className="h-3.5 w-3.5" /> Get Support</button>
                 {!["cancelled", "refunded", "failed"].includes(order.status) && (

@@ -48,7 +48,7 @@ export default function SupportModal({ isOpen, onClose, order }: SupportModalPro
           
           {/* Option 1: Email Support Link */}
           <a 
-            href={`mailto:support@yourdomain.com?subject=Support Request for Order ${order.orderId}`}
+            href={`mailto:support@jain.software?subject=Support Request for Order ${order.orderId}`}
             className="flex items-center gap-3 p-3 rounded-xl border border-border bg-background hover:bg-muted/40 text-left transition-colors text-xs text-foreground group"
           >
             <Mail className="h-4 w-4 text-muted-foreground group-hover:text-brand transition-colors" />
