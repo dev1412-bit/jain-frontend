@@ -24,6 +24,10 @@ type Props = {
 export default function ActivityItem({ activity, showUser = false }: Props) {
   const Icon = ICONS[activity.icon] ?? Activity;
 
+  const resolvedLink = activity.link && showUser
+    ? activity.link.replace(/^\/dashboard\b/, "/admin")
+    : activity.link;
+
   return (
     <div className="flex items-start gap-3 py-3.5 border-b border-border last:border-0 hover:bg-muted/20 px-4 transition-colors">
 
@@ -79,9 +83,9 @@ export default function ActivityItem({ activity, showUser = false }: Props) {
             <p className="text-xs text-muted-foreground whitespace-nowrap">
               {activity.timeAgo}
             </p>
-            {activity.link && (
+            {resolvedLink && (
               <Link
-                href={activity.link}
+                href={resolvedLink}
                 className="text-[11px] text-brand hover:underline mt-0.5 block"
               >
                 View →

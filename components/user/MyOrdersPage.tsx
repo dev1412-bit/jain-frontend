@@ -11,10 +11,10 @@ import LicenseModal from "@/components/user/LicenseModal";
 import SupportModal from "@/components/user/SupportModal";
 
 const SORT_OPTIONS = [
-  { label: "Date",      value: "newest"      },
-  { label: "Oldest",    value: "oldest"      },
-  { label: "Amount ↑",  value: "amount_asc"  },
-  { label: "Amount ↓",  value: "amount_desc" },
+  { label: "Date", value: "newest" },
+  { label: "Oldest", value: "oldest" },
+  { label: "Amount ↑", value: "amount_asc" },
+  { label: "Amount ↓", value: "amount_desc" },
 ];
 
 const STATUS_OPTIONS = ["All Status", "pending", "completed", "cancelled", "refunded", "failed"];
@@ -22,10 +22,10 @@ const STATUS_OPTIONS = ["All Status", "pending", "completed", "cancelled", "refu
 export default function MyOrdersPage() {
   const { myOrders, myOrdersLoading, myOrdersTotal, myOrdersPage, fetchMyOrders } = useOrderStore();
 
-  const [search,      setSearch]      = useState("");
-  const [status,      setStatus]      = useState("");
-  const [sort,        setSort]        = useState("newest");
-  const [expandedId,  setExpandedId]  = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [cancelModal, setCancelModal] = useState<{ open: boolean; order: Order | null }>({
     open: false, order: null,
   });
@@ -50,7 +50,7 @@ export default function MyOrdersPage() {
   const canCancel = (order: Order): boolean => {
     if (!order.createdAt) return false;
     if (["cancelled", "refunded", "failed"].includes(order.status)) return false;
-    const orderDate  = new Date(order.createdAt);
+    const orderDate = new Date(order.createdAt);
     const diffInDays = Math.floor((Date.now() - orderDate.getTime()) / (1000 * 60 * 60 * 24));
     return diffInDays < 10;
   };
@@ -69,10 +69,10 @@ export default function MyOrdersPage() {
 
   const statusColor = (s: string) => ({
     completed: "bg-green-100 text-green-600",
-    refunded:  "bg-blue-100 text-blue-600",
-    failed:    "bg-orange-100 text-orange-600",
+    refunded: "bg-blue-100 text-blue-600",
+    failed: "bg-orange-100 text-orange-600",
     cancelled: "bg-red-100 text-red-600",
-    pending:   "bg-yellow-100 text-yellow-600",
+    pending: "bg-yellow-100 text-yellow-600",
   }[s] ?? "bg-muted text-muted-foreground");
 
   return (
@@ -98,25 +98,46 @@ export default function MyOrdersPage() {
       {/* Table */}
       <div className="bg-background border border-border rounded-2xl overflow-hidden">
         {/* Header Grid */}
-        <div className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_40px] gap-4 px-5 py-3 border-b border-border text-xs uppercase text-muted-foreground font-semibold">
-          <span>Order ID</span><span>Product</span><span>Plan</span><span>Amount</span><span>Status</span><span>Date</span><span />
+        <div className="grid grid-cols-[1.3fr_1.8fr_1fr_1fr_1fr_1fr_32px] gap-4 px-5 py-3 border-b border-border text-xs uppercase text-muted-foreground font-semibold">
+          <span>Order ID</span>
+          <span>Product</span>
+          <span>Plan</span>
+          <span>Amount</span>
+          <span>Status</span>
+          <span>Date</span>
+          <span />
         </div>
 
         {myOrdersLoading ? (
-            Array.from({ length: 5 }).map((_, i) => <div key={i} className="px-5 py-4 border-b animate-pulse"><div className="h-4 bg-muted rounded w-full" /></div>)
+          Array.from({ length: 5 }).map((_, i) => <div key={i} className="px-5 py-4 border-b animate-pulse"><div className="h-4 bg-muted rounded w-full" /></div>)
         ) : myOrders.length === 0 ? (
           <div className="text-center py-16 text-sm text-muted-foreground">No orders found</div>
         ) : myOrders.map((order) => (
           <div key={order.id} className="border-b border-border">
-            <div onClick={() => setExpandedId(expandedId === order.id ? null : order.id)} className="grid grid-cols-[1.5fr_2fr_1fr_1fr_1fr_40px] gap-4 px-5 py-4 items-center hover:bg-muted/20 transition-colors cursor-pointer">
+            {/* Data row — now matches the 7-slot template above, with a real date value */}
+            <div
+              onClick={() => setExpandedId(expandedId === order.id ? null : order.id)}
+              className="grid grid-cols-[1.3fr_1.8fr_1fr_1fr_1fr_1fr_32px] gap-4 px-5 py-4 items-center hover:bg-muted/20 transition-colors cursor-pointer"
+            >
               <span className="text-brand font-mono text-xs font-semibold">{order.orderId}</span>
               <div>
                 <p className="text-sm font-medium text-foreground">{order.items?.[0]?.product_title ?? "—"}</p>
               </div>
               <span className="text-sm text-muted-foreground">{order.items?.[0]?.plan_name ?? "—"}</span>
-              <span className="text-sm font-medium text-foreground">₹{Number(order.total).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
-              <span><span className={cn("px-2 py-0.5 rounded-full text-xs font-medium capitalize", statusColor(order.status))}>{order.status}</span></span>
-              <span className="flex items-center justify-center">{expandedId === order.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</span>
+              <span className="text-sm font-medium text-foreground">
+                ₹{Number(order.total).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              </span>
+              <span>
+                <span className={cn("px-2 py-0.5 rounded-full text-xs font-medium capitalize", statusColor(order.status))}>
+                  {order.status}
+                </span>
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+              </span>
+              <span className="flex items-center justify-center">
+                {expandedId === order.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </span>
             </div>
 
             {/* Actions */}
