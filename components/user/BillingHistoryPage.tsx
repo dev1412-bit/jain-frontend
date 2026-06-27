@@ -5,6 +5,8 @@ import { FileDown } from "lucide-react";
 import { useBillingHistoryStore } from "@/store/billingHistoryStore";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
+import api from "@/lib/axios";   
+import { toast } from "sonner";
 
 export default function BillingHistoryPage() {
   const { user } = useAuthStore();
@@ -17,10 +19,17 @@ export default function BillingHistoryPage() {
     fetchBillingHistory(1);
   }, []);
 
-const handleDownloadPdf = (record: any) => {
-  // use backend mPDF route instead of inline generation
-  const url = `${process.env.NEXT_PUBLIC_API_URL}/invoices/${record.id}`;
-  window.open(url, "_blank");
+const handleDownloadPdf = async (record: any) => {
+  try {
+    const res = await api.get(`/invoices/${record.id}`, {
+      responseType: "blob",
+    });
+    const blobUrl = URL.createObjectURL(res.data);
+    window.open(blobUrl, "_blank");
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+  } catch (err) {
+    toast.error("Failed to download invoice");
+  }
 };
 
   const paymentStatusColor = (s: string) => ({
