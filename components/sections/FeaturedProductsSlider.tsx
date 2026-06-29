@@ -60,7 +60,6 @@ export default function FeaturedProductsSlider() {
     return () => el.removeEventListener("scroll", updateArrowState);
   }, [featuredProducts, updateArrowState]);
 
-  // hide section entirely if no featured products and not loading
   if (!featuredLoading && featuredProducts.length === 0) return null;
 
   return (

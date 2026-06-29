@@ -42,7 +42,6 @@ export default function GlobalSeoForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Calls your exact store function method
       await updateSeoSettings(form); 
     } catch (err) {
       console.error("Form save error:", err);
