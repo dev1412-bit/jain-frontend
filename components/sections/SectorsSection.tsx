@@ -44,7 +44,7 @@ export default function SectorsSection() {
           {sectors.map(({ label, icon: Icon }) => (
             <div
               key={label}
-              className="flex flex-col items-center justify-center gap-3 py-8 px-4 bg-background dark:bg-card rounded-2xl border border-border hover:border-brand/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default"
+              className="flex flex-col items-center justify-center gap-3 py-8 px-4 bg-card rounded-2xl border border-border hover:border-brand/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default"
             >
               <Icon
                 className="w-7 h-7 text-foreground"

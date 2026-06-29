@@ -31,6 +31,7 @@ const schema = z.object({
     price:          z.coerce.number().min(0),
     original_price: z.coerce.number().optional().nullable(),
     period:         z.string().min(1),
+    features:       z.array(z.string()).optional().default([]),
   })).optional(),
   seo: z.object({
     meta_title:       z.string().optional(),
@@ -73,7 +74,7 @@ export default function AddProductPage() {
     defaultValues: {
       title: "", slug: "", description: "",
       base_price: 0, status: "draft", category_id: "",
-      pricing_plans: [{ plan_name: "Monthly Plan", price: 0, period: "Monthly" }],
+      pricing_plans: [{ plan_name: "Monthly Plan", price: 0, period: "Monthly",  features: [], }],
       settings: { subscription_enabled: false },
     },
   });

@@ -12,7 +12,7 @@ import ProductTestimonials from "@/components/sections/product/ProductTestimonia
 import ProductFAQ from "@/components/sections/product/ProductFAQ";
 import StatsSection from "@/components/sections/StatsSection";
 import { useProductDetailStore, GLOBAL_TESTIMONIALS, GLOBAL_FAQS } from "@/store/productDetailsStore";
-
+import ProductReviews from "@/components/sections/product/ProductReviews";
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -112,6 +112,7 @@ export default function ProductDetailPage() {
 
           <ProductTestimonials testimonials={GLOBAL_TESTIMONIALS} />
           <ProductFAQ faqs={GLOBAL_FAQS} />
+          <ProductReviews productId={product.id} />
         </div>
 
       </div>
