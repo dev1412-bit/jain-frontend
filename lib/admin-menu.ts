@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Package, ShoppingCart,
   Tags, TicketPercent, BarChart3, Settings,
   Users, Image, DollarSign, FileText,
-  Headphones, MonitorPlay, Activity,
+  Headphones, MonitorPlay, Activity, Star, 
   Bell,
 } from "lucide-react";
 
@@ -21,5 +21,6 @@ export const adminMenu = [
   { label: "Pricing Management", href: "/admin/pricing",      icon: DollarSign      },
   { label: "Notifications",     href: "/admin/notifications",  icon: Bell      },
   { label: "CMS",               href: "/admin/website-cms",   icon: FileText        },
-  { label: "Settings",          href: "/admin/settings",     icon: Settings        },
+  { label: "Customer Reviews",  href: "/admin/reviews",      icon: Star        },
+  { label: "Settings",          href: "/admin/settings",     icon: Settings   },
 ];

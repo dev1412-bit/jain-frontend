@@ -173,7 +173,6 @@ export default function MyOrdersPage() {
         ))}
       </div>
 
-      {/* Pagination Logic */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-xs text-muted-foreground">Showing {Math.min(10, myOrders.length)} of {myOrdersTotal} orders</p>

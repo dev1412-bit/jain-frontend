@@ -44,15 +44,15 @@ export const useReviewStore = create<ReviewStore>((set) => ({
   adminLoading: false,
   adminTotal: 0,
 
-  fetchReviews: async (productId) => {
-    set({ loading: true });
-    try {
-      const res = await api.get(`/products/${productId}/reviews`);
-      set({ reviews: res.data.data.data ?? res.data.data, loading: false });
-    } catch {
-      set({ loading: false });
-    }
-  },
+fetchReviews: async (productId) => {
+  set({ loading: true });
+  try {
+    const res = await api.get(`/products/${productId}/reviews`);
+    set({ reviews: res.data.data, loading: false }); // was: res.data.data.data ?? res.data.data
+  } catch {
+    set({ loading: false });
+  }
+},
 
   fetchMyReview: async (productId) => {
     try {
@@ -101,23 +101,23 @@ export const useReviewStore = create<ReviewStore>((set) => ({
     }
   },
 
-  // ── Admin ──
-  fetchAdminReviews: async (page = 1, filters = {}) => {
+  
+    fetchAdminReviews: async (page = 1, filters = {}) => {
     set({ adminLoading: true });
     try {
-      const params = new URLSearchParams({ page: String(page) });
-      if (filters.status) params.append("status", filters.status);
-      const res = await api.get(`/admin/reviews?${params}`);
-      set({
-        adminReviews: res.data.data.data,
-        adminTotal: res.data.data.meta?.total ?? res.data.data.data.length,
+        const params = new URLSearchParams({ page: String(page) });
+        if (filters.status) params.append("status", filters.status);
+        const res = await api.get(`/admin/reviews?${params}`);
+        set({
+        adminReviews: res.data.data,                              // was: res.data.data.data
+        adminTotal: res.data.meta?.total ?? res.data.data.length,  // was: res.data.data.meta?.total ?? res.data.data.data.length
         adminLoading: false,
-      });
+        });
     } catch {
-      toast.error("Failed to load reviews");
-      set({ adminLoading: false });
+        toast.error("Failed to load reviews");
+        set({ adminLoading: false });
     }
-  },
+    },
 
   toggleReviewApproval: async (reviewId) => {
     try {
