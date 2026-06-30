@@ -40,6 +40,7 @@ export default function SignInModal() {
   const [error, setError] = useState("");
   const router = useRouter();
   const { setLoggedIn, mergeGuestCart } = useCartStore();
+  const { openForgotPassword } = useUIStore();
   const {
     register,
     handleSubmit,
@@ -210,6 +211,10 @@ const handleSocialLogin = (provider: "google" | "github") => {
                 </Label>
                 <button
                   type="button"
+                  onClick={() => {
+                    closeSignIn();
+                    openForgotPassword();
+                  }}
                   className="text-xs text-brand hover:underline"
                 >
                   Forgot password?

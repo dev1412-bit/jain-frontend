@@ -10,6 +10,9 @@ type UIStore = {
   // switch between modals
   switchToSignUp: () => void;
   switchToSignIn: () => void;
+  forgotPasswordOpen: boolean;
+  openForgotPassword: () => void;
+  closeForgotPassword: () => void;
 };
 
 export const useUIStore = create<UIStore>((set) => ({
@@ -21,4 +24,7 @@ export const useUIStore = create<UIStore>((set) => ({
   closeSignUp: () => set({ signUpOpen: false }),
   switchToSignUp: () => set({ signUpOpen: true, signInOpen: false }),
   switchToSignIn: () => set({ signInOpen: true, signUpOpen: false }),
+  forgotPasswordOpen: false,
+openForgotPassword: () => set({ signInOpen: false, forgotPasswordOpen: true }),
+closeForgotPassword: () => set({ forgotPasswordOpen: false }),
 }));

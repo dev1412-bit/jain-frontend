@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Geist, Geist_Mono, DM_Sans, Poppins, Nunito } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 import { ThemeProvider } from "@/components/layout/Themeprovider";
 import SignInModal from "@/components/modals/signInModal";
 import SignUpModal from "@/components/modals/signUpModal";
@@ -99,6 +99,7 @@ export default async function RootLayout({
           {children}
           <SignInModal />
           <SignUpModal />
+          <ForgotPasswordModal />
           <Toaster position="top-right" richColors />
         </ThemeProvider>
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
