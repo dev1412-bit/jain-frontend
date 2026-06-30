@@ -67,7 +67,7 @@ if (u.avatar) {
   setAvatarPreview(
     u.avatar.startsWith("http")
       ? u.avatar
-      : `http://localhost:8000/storage/${u.avatar}`
+      : `${process.env.NEXT_PUBLIC_BASE_URL}/storage/${u.avatar}` // 👈 fixed
   );
 }
     }).catch(() => {});

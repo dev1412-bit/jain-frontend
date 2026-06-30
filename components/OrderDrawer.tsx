@@ -212,20 +212,22 @@ export default function OrderDrawer({ order, onClose, onRefund, isAdmin = false 
             <Download className="h-4 w-4" /> Download Invoice
           </button>
 
-          {/* Only render Admin Controls if explicitly enabled */}
-          {isAdmin && onRefund && order.status !== "refunded" && order.status !== "cancelled" && (
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full gap-2 border-destructive/50 rounded-xl",
-                confirming ? "bg-destructive text-white hover:bg-destructive/90" : "text-destructive hover:bg-destructive/10"
-              )}
-              onClick={handleRefund}
-            >
-              <RotateCcw className="h-4 w-4" />
-              {confirming ? "Confirm Refund History Modification?" : "Refund Order"}
-            </Button>
-          )}
+            {isAdmin && onRefund &&
+              order.status !== "refunded" &&
+              order.status !== "cancelled" &&
+              order.paymentStatus === "paid" && (   
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full gap-2 border-destructive/50 rounded-xl",
+                  confirming ? "bg-destructive text-white hover:bg-destructive/90" : "text-destructive hover:bg-destructive/10"
+                )}
+                onClick={handleRefund}
+              >
+                <RotateCcw className="h-4 w-4" />
+                {confirming ? "Confirm Refund History Modification?" : "Refund Order"}
+              </Button>
+            )}
         </div>
       </aside>
     </>
