@@ -189,7 +189,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: "cart-storage",
+      name: "cart-storage-v2",
       // only persist local items and coupon — not isLoggedIn
       partialize: (state) => ({
         items:          state.items,

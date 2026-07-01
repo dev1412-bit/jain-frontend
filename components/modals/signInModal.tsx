@@ -68,8 +68,6 @@ const onSubmit = async (data: SignInForm) => {
     toast.success("Welcome back!", {
       description: `Signed in as ${res.user.name}`,
     });
-
-  setTimeout(() => {
     if (role === "admin") {
       router.push("/admin");
     } else {
@@ -81,7 +79,6 @@ const onSubmit = async (data: SignInForm) => {
         router.push("/dashboard");
       }
     }
-  }, 150);
 
   } catch (err: any) {
     const msg =

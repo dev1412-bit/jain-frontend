@@ -33,10 +33,18 @@ function StatusBadge({ status }: { status: string }) {
 export default function OrderDrawer({ order, onClose, onRefund, isAdmin = false }: OrderDrawerProps) {
   const [confirming, setConfirming] = useState(false);
 
-  const handleRefund = () => {
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleRefund = async () => {
     if (!confirming) { setConfirming(true); return; }
-    if (onRefund) onRefund(order.id);
-    setConfirming(false);
+    if (!onRefund) return;
+    setSubmitting(true);
+    try {
+      await onRefund(order.id);
+    } finally {
+      setSubmitting(false);
+      setConfirming(false);
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -222,10 +230,11 @@ export default function OrderDrawer({ order, onClose, onRefund, isAdmin = false 
                   "w-full gap-2 border-destructive/50 rounded-xl",
                   confirming ? "bg-destructive text-white hover:bg-destructive/90" : "text-destructive hover:bg-destructive/10"
                 )}
+                 disabled={submitting}
                 onClick={handleRefund}
               >
                 <RotateCcw className="h-4 w-4" />
-                {confirming ? "Confirm Refund History Modification?" : "Refund Order"}
+                {submitting ? "Processing..." : confirming ? "Confirm Refund" : "Refund Order"}
               </Button>
             )}
         </div>

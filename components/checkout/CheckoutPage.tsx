@@ -105,7 +105,7 @@ function OrderSummaryCard({
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-foreground truncate">{item.name}</p>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand/10 text-brand font-medium">
-                {item.name.match(/\((.+?)\)/)?.[1] ?? "Plan"}
+                {item.planName ?? "Plan"}
               </span>
             </div>
             <div className="text-right shrink-0">
@@ -251,6 +251,11 @@ export default function CheckoutPage() {
   // Step 3 → place order
   const handlePlaceOrder = async () => {
     if (!billingData) return;
+    const missingPlan = items.find((i) => !i.planId || !i.planName || !i.planPeriod);
+    if (missingPlan) {
+      toast.error(`"${missingPlan.name}" is missing plan details. Please remove and re-add it to your cart.`);
+      return;
+    }
     setPlacing(true);
     try {
       const order = await placeOrder({
@@ -272,6 +277,9 @@ export default function CheckoutPage() {
           price:    i.price,
           quantity: i.quantity,
           slug:     i.slug,
+          plan_id:     i.planId,       
+          plan_name:   i.planName,    
+          plan_period: i.planPeriod,  
         })),
         coupon_code:    couponCode ?? undefined,
         payment_method: paymentMethod,
@@ -496,9 +504,9 @@ export default function CheckoutPage() {
                       )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground">{item.name.split(" (")[0]}</p>
+                      <p className="text-sm font-semibold text-foreground">{item.name}</p>
                       <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-brand/10 text-brand font-medium">
-                        {item.name.match(/\((.+?)\)/)?.[1] ?? "Plan"}
+                        {item.planName ?? "Plan"}
                       </span>
                     </div>
                     <div className="text-right">

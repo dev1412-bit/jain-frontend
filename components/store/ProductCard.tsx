@@ -42,9 +42,7 @@ export default function ProductCard({ product }: Props) {
   const handleAddToCart = () => {
     addItem({
       id:         product.id,
-      name:       firstPlan
-                    ? `${name} (${firstPlan.planName})`
-                    : name,
+      name:       name,
       price:      displayPrice,
       image:      image ?? "",
       slug,
