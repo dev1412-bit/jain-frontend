@@ -81,11 +81,16 @@ const onSubmit = async (data: SignInForm) => {
     }
 
   } catch (err: any) {
+    const status = err?.response?.status;
     const msg =
       err?.response?.data?.message ||
       "Invalid email or password";
     setError(msg);
-    toast.error("Sign in failed", { description: msg });
+      if (status === 403) {
+        toast.error("Account deactivated", { description: msg });
+      } else {
+        toast.error("Sign in failed", { description: msg });
+      }
   } finally {
     setLoading(false);
   }
