@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 export type Customer = {
   id: string;
-  uuid?: string;
+  uuid: string;
   email: string;
   name: string;
   phone?: string | null;

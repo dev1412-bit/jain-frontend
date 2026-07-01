@@ -220,7 +220,7 @@ export default function CustomersPage() {
 
                 {/* View */}
                 <td className="px-4 py-3">
-                  <Link href={`/admin/customers/${customer.id}`}>
+                  <Link href={`/admin/customers/${customer.uuid}`}>
                     <Button variant="outline" size="sm" className="gap-1">
                       <Eye className="h-3.5 w-3.5" />
                       View
