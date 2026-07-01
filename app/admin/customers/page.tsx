@@ -84,7 +84,7 @@ export default function CustomersPage() {
 
   const handleToggle = async (customer: Customer) => {
     if (!confirm(`${customer.is_active ? "Deactivate" : "Activate"} ${customer.name}?`)) return;
-    await toggleActive(customer.id);
+    await toggleActive(customer.uuid);
   };
 
   return (

@@ -59,7 +59,7 @@ type CustomerStore = {
   fetchCustomer: (id: string) => Promise<void>;
   fetchStats: () => Promise<void>;
   updateStatus: (id: string, status: Customer["status"]) => Promise<void>;
-  toggleActive: (id: string) => Promise<void>;
+  toggleActive: (uuid: string) => Promise<void>;
 };
 
 export const useCustomerStore = create<CustomerStore>()(
@@ -125,22 +125,22 @@ export const useCustomerStore = create<CustomerStore>()(
       },
 
 
-           toggleActive: async (id) => {
+           toggleActive: async (uuid) => {
         // optimistic update
         const prev = get().customers;
         set((s) => ({
           customers: s.customers.map((c) =>
-            c.id === id ? { ...c, is_active: !c.is_active } : c
+            c.uuid === uuid ? { ...c, is_active: !c.is_active } : c
           ),
         }));
 
         try {
-          const res = await api.post(`/admin/customers/${id}/toggle-active`);
+          const res = await api.post(`/admin/customers/${uuid}/toggle-active`);
           const updated: Customer = res.data.data ?? res.data;
           set((s) => ({
-            customers: s.customers.map((c) => (c.id === id ? updated : c)),
+            customers: s.customers.map((c) => (c.uuid === uuid ? updated : c)),
             selectedCustomer:
-              s.selectedCustomer?.id === id ? updated : s.selectedCustomer,
+              s.selectedCustomer?.uuid === uuid ? updated : s.selectedCustomer,
           }));
           toast.success(updated.is_active ? "Customer activated" : "Customer deactivated");
         } catch {
