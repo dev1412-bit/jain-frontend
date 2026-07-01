@@ -14,16 +14,20 @@ import StatsSection from "@/components/sections/StatsSection";
 import { useProductDetailStore, GLOBAL_TESTIMONIALS, GLOBAL_FAQS } from "@/store/productDetailsStore";
 import ProductReviews from "@/components/sections/product/ProductReviews";
 import { toast } from "sonner";
-
+import { useCmsStore } from "@/store/cmsStore";
 
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { product, loading, fetchProduct } = useProductDetailStore();
-
+  const { testimonials, fetchTestimonials } = useCmsStore();
   useEffect(() => {
     if (slug) fetchProduct(slug);
   }, [slug]);
+
+    useEffect(() => {
+    fetchTestimonials();
+  }, []);
 
   // ── Loading skeleton ──
   if (loading) {
@@ -111,7 +115,7 @@ export default function ProductDetailPage() {
           {/* Features */}
           <ProductFeatures features={product.features} />
 
-          <ProductTestimonials testimonials={GLOBAL_TESTIMONIALS} />
+          <ProductTestimonials testimonials={testimonials} />
           <ProductFAQ faqs={GLOBAL_FAQS} />
           <ProductReviews productId={product.id} />
         </div>

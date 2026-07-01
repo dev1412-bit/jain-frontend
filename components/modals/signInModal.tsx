@@ -68,17 +68,20 @@ const onSubmit = async (data: SignInForm) => {
     toast.success("Welcome back!", {
       description: `Signed in as ${res.user.name}`,
     });
-      if (role === "admin") {
+
+  setTimeout(() => {
+    if (role === "admin") {
       router.push("/admin");
     } else {
-        const redirectTo = sessionStorage.getItem("checkout_redirect");
-        if (redirectTo) {
-          sessionStorage.removeItem("checkout_redirect");
-          router.push(redirectTo);
-        }else{
-          router.push("/dashboard");
-        }
+      const redirectTo = sessionStorage.getItem("checkout_redirect");
+      if (redirectTo) {
+        sessionStorage.removeItem("checkout_redirect");
+        router.push(redirectTo);
+      } else {
+        router.push("/dashboard");
+      }
     }
+  }, 150);
 
   } catch (err: any) {
     const msg =

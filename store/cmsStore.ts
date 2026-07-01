@@ -70,7 +70,7 @@ type CmsStore = {
   createTestimonial: (data: Partial<Testimonial>) => Promise<void>;
   updateTestimonial: (id: string, data: Partial<Testimonial>) => Promise<void>;
   deleteTestimonial: (id: string) => Promise<void>;
-
+ fetchTestimonials: () => Promise<void>;
   // faqs
   createFaq: (data: Partial<Faq>) => Promise<void>;
   updateFaq: (id: string, data: Partial<Faq>) => Promise<void>;
@@ -163,6 +163,14 @@ export const useCmsStore = create<CmsStore>((set) => ({
       toast.success("Testimonial updated!");
     } catch { toast.error("Failed to update"); throw new Error(); }
   },
+  fetchTestimonials: async () => {
+  try {
+    const res = await api.get("/cms/public");
+    set({ testimonials: (res.data.testimonials ?? []).map(mapTestimonial) });
+  } catch {
+  
+  }
+},
 
   deleteTestimonial: async (id) => {
     try {

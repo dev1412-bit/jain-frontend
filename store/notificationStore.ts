@@ -82,7 +82,7 @@ fetchNotifications: async (page = 1) => {
 
   markRead: async (id) => {
     try {
-      await api.patch(`/notifications/${id}/read`);
+      await api.post(`/notifications/${id}/read`);
       set((s) => ({
         notifications: s.notifications.map((n) =>
           n.id === id ? { ...n, read: true } : n
@@ -94,7 +94,7 @@ fetchNotifications: async (page = 1) => {
 
   markAllRead: async () => {
     try {
-      await api.patch("/notifications/read-all");
+      await api.post("/notifications/read-all");
       set((s) => ({
         notifications: s.notifications.map((n) => ({ ...n, read: true })),
         unreadCount: 0,
