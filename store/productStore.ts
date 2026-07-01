@@ -103,7 +103,9 @@ type ProductStore = {
   deleteProduct: (id: string) => Promise<void>;
   uploadMedia: (productId: string, file: File) => Promise<ProductMedia>;
   deleteMedia: (productId: string, mediaId: string) => Promise<void>;
-
+  recommendedProducts: Product[];
+  recommendedLoading: boolean;
+  fetchRecommendedProducts: (slugs: string[]) => Promise<void>;
   // ── Store (frontend) ──
   storeProducts: Product[];
   storeLoading: boolean;
@@ -277,6 +279,22 @@ export const useProductStore = create<ProductStore>()(
         }
 
         return result;
+      },
+      recommendedProducts: [],
+      recommendedLoading: false,
+
+      fetchRecommendedProducts: async (slugs) => {
+        if (slugs.length === 0) {
+          set({ recommendedProducts: [] });
+          return;
+        }
+        set({ recommendedLoading: true });
+        try {
+          const res = await api.post("/products/recommended", { product_slugs: slugs });
+          set({ recommendedProducts: res.data.data ?? res.data, recommendedLoading: false });
+        } catch {
+          set({ recommendedLoading: false });
+        }
       },
     }),
     {

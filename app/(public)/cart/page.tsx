@@ -6,6 +6,7 @@ import CartItemRow from "@/components/sections/cart/CartItemRow";
 import OrderSummary from "@/components/sections/cart/OrderSummary";
 import { useCartStore } from "@/store/cartStore";
 import { Button } from "@/components/ui/button";
+import RecommendedForYouSlider from "@/components/store/RecommendedForYouSlider";
 
 export default function CartPage() {
   const { items, clearCart } = useCartStore();
@@ -67,6 +68,7 @@ export default function CartPage() {
           <OrderSummary />
         </div>
       </div>
+        <RecommendedForYouSlider />
     </div>
   );
 }
