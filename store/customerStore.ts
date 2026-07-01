@@ -14,7 +14,7 @@ export type Customer = {
   gstin?: string | null;
   role?: string;
   total_orders: number;
-  total_spent: string;
+  total_spent: number;
   status: "active" | "suspended" | "blacklisted";
   is_active: boolean;
   is_registered: boolean;

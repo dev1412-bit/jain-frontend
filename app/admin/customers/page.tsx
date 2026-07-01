@@ -213,7 +213,7 @@ export default function CustomersPage() {
                 </td>
 
                 <td className="px-4 py-3 font-medium text-foreground">
-                  ₹{Number(customer.total_spent).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                 ₹{customer.total_spent.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </td>
 
                 <td className="px-4 py-3">
