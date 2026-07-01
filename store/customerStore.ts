@@ -59,6 +59,7 @@ type CustomerStore = {
   fetchCustomer: (id: string) => Promise<void>;
   fetchStats: () => Promise<void>;
   updateStatus: (id: string, status: Customer["status"]) => Promise<void>;
+  toggleActive: (id: string) => Promise<void>;
 };
 
 export const useCustomerStore = create<CustomerStore>()(
@@ -120,6 +121,32 @@ export const useCustomerStore = create<CustomerStore>()(
           toast.success(`Customer ${status === "active" ? "activated" : "suspended"}`);
         } catch {
           toast.error("Failed to update status");
+        }
+      },
+
+
+           toggleActive: async (id) => {
+        // optimistic update
+        const prev = get().customers;
+        set((s) => ({
+          customers: s.customers.map((c) =>
+            c.id === id ? { ...c, is_active: !c.is_active } : c
+          ),
+        }));
+
+        try {
+          const res = await api.post(`/admin/customers/${id}/toggle-active`);
+          const updated: Customer = res.data.data ?? res.data;
+          set((s) => ({
+            customers: s.customers.map((c) => (c.id === id ? updated : c)),
+            selectedCustomer:
+              s.selectedCustomer?.id === id ? updated : s.selectedCustomer,
+          }));
+          toast.success(updated.is_active ? "Customer activated" : "Customer deactivated");
+        } catch {
+          // rollback on failure
+          set({ customers: prev });
+          toast.error("Failed to update customer status");
         }
       },
     }),

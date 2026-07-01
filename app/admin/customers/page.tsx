@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Search, ChevronDown, Users, UserCheck, UserX } from "lucide-react";
+import Link from "next/link";
+import { Search, ChevronDown, Users, UserCheck, Eye } from "lucide-react";
 import { useCustomerStore, Customer } from "@/store/customerStore";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,36 @@ function StatusBadge({ status }: { status: Customer["status"] }) {
   );
 }
 
+// ─── Active toggle ─────────────────────────────────────────────────────────────
+
+function ActiveToggle({
+  active,
+  onChange,
+}: {
+  active: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={active}
+      onClick={onChange}
+      className={cn(
+        "relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0",
+        active ? "bg-green-500" : "bg-muted"
+      )}
+    >
+      <span
+        className={cn(
+          "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform",
+          active ? "translate-x-4.5" : "translate-x-0.5"
+        )}
+      />
+    </button>
+  );
+}
+
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-IN", {
     day: "numeric",
@@ -34,7 +65,7 @@ function formatDate(dateStr: string): string {
 // ─── Customers Page ───────────────────────────────────────────────────────────
 
 export default function CustomersPage() {
-  const { customers, loading, total, currentPage, fetchCustomers, updateStatus } = useCustomerStore();
+  const { customers, loading, total, currentPage, fetchCustomers, toggleActive } = useCustomerStore();
 
   const [search, setSearch]       = useState("");
   const [statusFilter, setStatus] = useState("");
@@ -51,9 +82,9 @@ export default function CustomersPage() {
 
   const totalPages = Math.ceil(total / 10);
 
-  const handleStatusChange = async (customer: Customer, status: Customer["status"]) => {
-    if (!confirm(`Set ${customer.name} as ${status}?`)) return;
-    await updateStatus(customer.id, status);
+  const handleToggle = async (customer: Customer) => {
+    if (!confirm(`${customer.is_active ? "Deactivate" : "Activate"} ${customer.name}?`)) return;
+    await toggleActive(customer.id);
   };
 
   return (
@@ -64,18 +95,6 @@ export default function CustomersPage() {
         <div>
           <h1 className="text-xl font-bold text-foreground">Customers</h1>
           <p className="text-sm text-muted-foreground">{total} total customers</p>
-        </div>
-
-        {/* Quick stats */}
-        <div className="hidden md:flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-background text-sm text-muted-foreground">
-            <UserCheck className="h-4 w-4 text-blue-500" />
-            <span>Registered</span>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-background text-sm text-muted-foreground">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span>Guests</span>
-          </div>
         </div>
       </div>
 
@@ -91,7 +110,6 @@ export default function CustomersPage() {
           />
         </div>
 
-        {/* Type filter */}
         <div className="relative">
           <select
             value={typeFilter}
@@ -105,7 +123,6 @@ export default function CustomersPage() {
           <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         </div>
 
-        {/* Status filter */}
         <div className="relative">
           <select
             value={statusFilter}
@@ -132,28 +149,28 @@ export default function CustomersPage() {
               <th className="px-4 py-3 text-left">Total Spent</th>
               <th className="px-4 py-3 text-left">Status</th>
               <th className="px-4 py-3 text-left">Joined</th>
-              <th className="px-4 py-3 text-left">Actions</th>
+              <th className="px-4 py-3 text-left">Active</th>
+              <th className="px-4 py-3 text-left">View</th>
             </tr>
           </thead>
           <tbody>
             {loading && customers.length === 0 ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <tr key={i} className="border-b border-border">
-                  <td colSpan={7} className="px-4 py-3">
+                  <td colSpan={8} className="px-4 py-3">
                     <div className="h-4 bg-muted animate-pulse rounded" />
                   </td>
                 </tr>
               ))
             ) : customers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="text-center py-12 text-muted-foreground">
+                <td colSpan={8} className="text-center py-12 text-muted-foreground">
                   No customers found
                 </td>
               </tr>
             ) : customers.map((customer) => (
               <tr key={customer.id} className="border-b border-border hover:bg-muted/30 transition-colors">
 
-                {/* Customer */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center text-brand font-semibold text-xs shrink-0">
@@ -166,7 +183,6 @@ export default function CustomersPage() {
                   </div>
                 </td>
 
-                {/* Type */}
                 <td className="px-4 py-3">
                   <span className={cn(
                     "px-2 py-0.5 rounded-full text-xs font-medium",
@@ -178,59 +194,38 @@ export default function CustomersPage() {
                   </span>
                 </td>
 
-                {/* Orders */}
                 <td className="px-4 py-3 text-foreground font-medium">
                   {customer.total_orders}
                 </td>
 
-                {/* Total Spent */}
                 <td className="px-4 py-3 font-medium text-foreground">
                   ₹{Number(customer.total_spent).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </td>
 
-                {/* Status */}
                 <td className="px-4 py-3">
                   <StatusBadge status={customer.status} />
                 </td>
 
-                {/* Joined */}
                 <td className="px-4 py-3 text-muted-foreground text-xs">
                   {customer.created_at ? formatDate(customer.created_at) : "—"}
                 </td>
 
-                {/* Actions */}
+                {/* Active toggle */}
                 <td className="px-4 py-3">
-                  <div className="relative group inline-block">
-                    <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground border border-border rounded-md px-2 py-1">
-                      Actions <ChevronDown className="h-3 w-3" />
-                    </button>
-                    <div className="absolute right-0 top-full mt-1 w-36 bg-background border border-border rounded-xl shadow-lg z-10 hidden group-hover:block">
-                      {customer.status !== "active" && (
-                        <button
-                          onClick={() => handleStatusChange(customer, "active")}
-                          className="w-full text-left px-3 py-2 text-xs hover:bg-muted/50 text-green-600 rounded-t-xl"
-                        >
-                          Set Active
-                        </button>
-                      )}
-                      {customer.status !== "suspended" && (
-                        <button
-                          onClick={() => handleStatusChange(customer, "suspended")}
-                          className="w-full text-left px-3 py-2 text-xs hover:bg-muted/50 text-yellow-600"
-                        >
-                          Suspend
-                        </button>
-                      )}
-                      {customer.status !== "blacklisted" && (
-                        <button
-                          onClick={() => handleStatusChange(customer, "blacklisted")}
-                          className="w-full text-left px-3 py-2 text-xs hover:bg-muted/50 text-red-500 rounded-b-xl"
-                        >
-                          Blacklist
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  <ActiveToggle
+                    active={customer.is_active}
+                    onChange={() => handleToggle(customer)}
+                  />
+                </td>
+
+                {/* View */}
+                <td className="px-4 py-3">
+                  <Link href={`/admin/customers/${customer.id}`}>
+                    <Button variant="outline" size="sm" className="gap-1">
+                      <Eye className="h-3.5 w-3.5" />
+                      View
+                    </Button>
+                  </Link>
                 </td>
               </tr>
             ))}
