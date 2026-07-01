@@ -11,7 +11,21 @@ import { cn } from "@/lib/utils";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 
+// function StatusBadge({ status }: { status: Customer["status"] }) {
+//   return (
+//     <span className={cn(
+//       "px-2 py-0.5 rounded-full text-xs font-medium",
+//       status === "active"      && "bg-green-100  text-green-600",
+//       status === "suspended"   && "bg-yellow-100 text-yellow-600",
+//       status === "blacklisted" && "bg-red-100    text-red-500",
+//     )}>
+//       {status}
+//     </span>
+//   );
+// }
+
 function StatusBadge({ status }: { status: Customer["status"] }) {
+  const label = status === "suspended" ? "Inactive" : status;
   return (
     <span className={cn(
       "px-2 py-0.5 rounded-full text-xs font-medium",
@@ -19,7 +33,7 @@ function StatusBadge({ status }: { status: Customer["status"] }) {
       status === "suspended"   && "bg-yellow-100 text-yellow-600",
       status === "blacklisted" && "bg-red-100    text-red-500",
     )}>
-      {status}
+      {label}
     </span>
   );
 }
